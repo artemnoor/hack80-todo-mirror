@@ -1,0 +1,6 @@
+import http from 'node:http';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+const root=path.resolve('site');
+const types={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.svg':'image/svg+xml','.png':'image/png','.otf':'font/otf','.ttf':'font/ttf'};
+http.createServer(async(req,res)=>{let pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname); const routes={'/':'index.html','/todo':'index.html','/logIn':'pages/login.html','/register':'pages/register.html','/owndata':'pages/profile.html','/teams':'pages/team.html','/teams/my':'pages/team.html','/teams/application':'pages/application.html','/submitsolution':'pages/solution.html','/tasks':'pages/tasks.html'}; const key=pathname.length>1?pathname.replace(/\/+$/,''):pathname; pathname='/'+(routes[key]||key.replace(/^\//,'')); const file=path.resolve(root,'.'+pathname); if(!file.startsWith(root)){res.writeHead(403).end();return} try{const data=await fs.readFile(file);res.writeHead(200,{'content-type':types[path.extname(file)]||'application/octet-stream'}).end(data)}catch{res.writeHead(404).end('Not found')}}).listen(Number(process.env.PORT||4173),()=>console.log(`http://localhost:${process.env.PORT||4173}/register`));
